@@ -1,0 +1,52 @@
+name: build and push app to ECR AWS 
+
+env: 
+  AWS_REGION: us-east-2
+  AWS_IAM_ROLE_ARN: arn:aws:iam::123456789012:role/ormuco-github-actions-role
+
+
+  on:
+   push:
+    branches: 
+      - main
+
+
+job: 
+  build:
+    runs-on: ubuntu-latest
+    
+
+    permissions:
+      id-token: write
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5  
+ 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          audience: sts.amazonaws.com
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ env.AWS_IAM_ROLE_ARN }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        run: |
+          bash ./scripts/git_update.sh -v patch
+      
+      - name: Add app version (Optional)
+        run: |
+          echo "${{ steps.release.outputs.new_tag }}" > version.txt
+
+      - name: Build and tag push Docker image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ github.repository }}
+          IMAGE_TAG: ${{ steps.release.outputs.new_tag }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+           
+  
