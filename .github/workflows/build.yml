@@ -45,7 +45,7 @@ jobs:
           ECR_REPOSITORY: ormuco
           IMAGE_TAG: ${{ steps.release.outputs.new_tag }}
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./backend/docker
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./backend/
 
       - name: Push Docker image
         env:
