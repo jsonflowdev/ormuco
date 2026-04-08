@@ -8,7 +8,7 @@ on:
 
 env:
   AWS_REGION: us-east-2
-  AWS_IAM_ROLE_ARN: arn:aws:iam::123456789012:role/ormuco-github-actions-role
+  AWS_IAM_ROLE_ARN: arn:aws:iam::255834078988:role/openidconnectprovider
 
 jobs:
   build:
